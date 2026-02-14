@@ -65,7 +65,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="py-12 border-t border-white/10 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} Zenith. Built for the Hackathon.</p>
+          <p>© {new Date().getFullYear()} VitalMind. Built for the Hackathon.</p>
         </footer>
       </div>
     </main>

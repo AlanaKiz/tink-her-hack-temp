@@ -21,6 +21,11 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center py-6 px-4">
       <div className="glass rounded-full px-6 py-3 flex items-center gap-2 md:gap-8 shadow-2xl bg-black/20 border border-white/10 backdrop-blur-md">
+        <div className="flex items-center gap-2 pr-4 border-r border-white/10">
+          <span className="text-sm font-black tracking-widest text-white uppercase italic">
+            VitalMind
+          </span>
+        </div>
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
