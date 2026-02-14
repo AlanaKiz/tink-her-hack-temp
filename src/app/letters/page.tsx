@@ -45,13 +45,24 @@ export default function LettersPage() {
     }, []);
 
     // --- Logic: Letters ---
+    const checkIsUnlocked = (unlockDate: string) => {
+        const now = new Date();
+        const unlock = new Date(unlockDate);
+        // Compare dates (ignoring time for a more intuitive "unlock on this day" behavior)
+        // Or if we want exact time, we use now >= unlock. 
+        // Given it's a date picker (YYYY-MM-DD), let's make it unlock at the start of that day local time.
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const unlockDay = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate());
+        return today >= unlockDay;
+    };
+
     const loadLetters = () => {
         const saved = localStorage.getItem("zenith_future_letters");
         if (saved) {
             const parsed = JSON.parse(saved);
             const updated = parsed.map((l: Letter) => ({
                 ...l,
-                isUnlocked: new Date() >= new Date(l.unlockDate)
+                isUnlocked: checkIsUnlocked(l.unlockDate)
             }));
             setLetters(updated.sort((a: Letter, b: Letter) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         }
@@ -64,7 +75,7 @@ export default function LettersPage() {
             ...newLetter,
             userId: "user_123", // Simulated user ID
             createdAt: new Date().toISOString(),
-            isUnlocked: false
+            isUnlocked: checkIsUnlocked(newLetter.unlockDate)
         };
 
         const response = await fetch("/api/letters", {
@@ -75,7 +86,13 @@ export default function LettersPage() {
 
         if (response.ok) {
             const createdLetter = await response.json();
-            const updatedLetters = [createdLetter, ...letters];
+            // Ensure the newly created letter has the correct unlock status based on current time
+            const letterWithStatus = {
+                ...createdLetter,
+                isUnlocked: checkIsUnlocked(createdLetter.unlockDate)
+            };
+
+            const updatedLetters = [letterWithStatus, ...letters];
             setLetters(updatedLetters);
             localStorage.setItem("zenith_future_letters", JSON.stringify(updatedLetters));
 
@@ -95,9 +112,17 @@ export default function LettersPage() {
     };
 
     const getTimeRemaining = (unlockDate: string) => {
-        const total = Date.parse(unlockDate) - Date.now();
-        const days = Math.floor(total / (1000 * 60 * 60 * 24));
-        return days > 0 ? `${days} days left` : "Unlocks soon";
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const unlock = new Date(unlockDate);
+        const unlockDay = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate());
+
+        const diffTime = unlockDay.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 0) return "Ready to open!";
+        if (diffDays === 1) return "Unlocks tomorrow";
+        return `${diffDays} days left`;
     };
 
     return (
