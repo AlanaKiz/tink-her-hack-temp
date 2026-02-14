@@ -52,7 +52,7 @@ export default function Hero() {
                     className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                 >
                     <Link
-                        href="/journal"
+                        href="/check-in"
                         className="group px-8 py-4 rounded-full bg-white text-black font-semibold text-lg flex items-center gap-2 hover:bg-gray-200 transition-colors"
                     >
                         Get Started

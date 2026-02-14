@@ -13,7 +13,7 @@ export default function AnalyticsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-12 text-center"
             >
-                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500 mb-2">
+                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-500 mb-2">
                     Your Insights
                 </h1>
                 <p className="text-gray-400">Track your progress and understand your habits.</p>

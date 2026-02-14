@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Book, CheckSquare, Compass, BarChart2 } from "lucide-react";
+import { Home, Book, CheckSquare, Compass, BarChart2, Mail } from "lucide-react";
 import clsx from "clsx";
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { name: "Todo", href: "/todo", icon: CheckSquare },
   { name: "Guidance", href: "/guidance", icon: Compass },
   { name: "Analytics", href: "/analytics", icon: BarChart2 },
+  { name: "Letters", href: "/letters", icon: Mail },
 ];
 
 export default function Navbar() {
@@ -45,7 +46,7 @@ export default function Navbar() {
               <span className="text-sm font-medium relative z-10 hidden md:block">
                 {item.name}
               </span>
-              
+
               {/* Glow effect on hover */}
               <div className="absolute inset-0 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
             </Link>

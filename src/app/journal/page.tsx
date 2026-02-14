@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import React from 'react';
 import { motion } from "framer-motion";
 import { Plus, Save, Trash2 } from "lucide-react";
 
@@ -11,14 +12,39 @@ interface JournalEntry {
 }
 
 export default function JournalPage() {
-    const [entries, setEntries] = useState<JournalEntry[]>([
-        {
-            id: "1",
-            date: new Date().toLocaleDateString(),
-            content: "Today I started working on the new project. It feels great to be productive!",
-        },
-    ]);
+    const [entries, setEntries] = useState<JournalEntry[]>([]);
     const [newEntry, setNewEntry] = useState("");
+
+    // Load entries from local storage
+    useEffect(() => {
+        const savedEntries = localStorage.getItem("zenith_journal_entries");
+        if (savedEntries) {
+            setEntries(JSON.parse(savedEntries));
+        } else {
+            // Seed data
+            const initialEntries = [
+                {
+                    id: "1",
+                    date: new Date().toLocaleDateString(),
+                    content: "Today I started working on the new project. It feels great to be productive! I was a bit anxious at first but now I am confident.",
+                },
+                {
+                    id: "2",
+                    date: new Date(Date.now() - 86400000).toLocaleDateString(),
+                    content: "Feeling a bit overwhelmed with the deadline. Need to focus more.",
+                }
+            ];
+            setEntries(initialEntries);
+            localStorage.setItem("zenith_journal_entries", JSON.stringify(initialEntries));
+        }
+    }, []);
+
+    // Save entries on change
+    useEffect(() => {
+        if (entries.length > 0) {
+            localStorage.setItem("zenith_journal_entries", JSON.stringify(entries));
+        }
+    }, [entries]);
 
     const handleSave = () => {
         if (!newEntry.trim()) return;

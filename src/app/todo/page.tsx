@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Check, Trash2, Circle } from "lucide-react";
+import { Plus, Check, Trash2, Circle, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Todo {
@@ -12,11 +12,39 @@ interface Todo {
 }
 
 export default function TodoPage() {
-    const [todos, setTodos] = useState<Todo[]>([
-        { id: "1", text: "Welcome to your new productivity hub", completed: false },
-        { id: "2", text: "Complete the landing page", completed: true },
-    ]);
+    const [todos, setTodos] = useState<Todo[]>([]);
     const [newTodo, setNewTodo] = useState("");
+    const [coins, setCoins] = useState(0);
+
+    // Load coins from local storage
+    useEffect(() => {
+        const savedCoins = localStorage.getItem("zenith_coins");
+        if (savedCoins) {
+            setCoins(parseInt(savedCoins, 10));
+        }
+    }, []);
+    // Load todos from local storage on mount
+    useEffect(() => {
+        const savedTodos = localStorage.getItem("zenith_todos");
+        if (savedTodos) {
+            setTodos(JSON.parse(savedTodos));
+        } else {
+            // Initial seed if empty
+            const initialTodos = [
+                { id: "1", text: "Welcome to your new productivity hub", completed: false },
+                { id: "2", text: "Complete the landing page", completed: true },
+            ];
+            setTodos(initialTodos);
+            localStorage.setItem("zenith_todos", JSON.stringify(initialTodos));
+        }
+    }, []);
+
+    // Save todos to local storage whenever they change
+    useEffect(() => {
+        if (todos.length > 0) {
+            localStorage.setItem("zenith_todos", JSON.stringify(todos));
+        }
+    }, [todos]);
 
     const handleAddString = (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,22 +54,41 @@ export default function TodoPage() {
             text: newTodo,
             completed: false,
         };
-        setTodos([todo, ...todos]);
+        const updatedTodos = [todo, ...todos];
+        setTodos(updatedTodos);
         setNewTodo("");
     };
 
     const toggleTodo = (id: string) => {
-        setTodos(
-            todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-        );
+        const todo = todos.find((t) => t.id === id);
+        if (todo && !todo.completed) {
+            // Award coins only when completing a task
+            const newCoins = coins + 10;
+            setCoins(newCoins);
+            localStorage.setItem("zenith_coins", newCoins.toString());
+        }
+
+        const updatedTodos = todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
+        setTodos(updatedTodos);
     };
 
     const deleteTodo = (id: string) => {
-        setTodos(todos.filter((t) => t.id !== id));
+        const updatedTodos = todos.filter((t) => t.id !== id);
+        setTodos(updatedTodos);
     };
 
     return (
-        <div className="min-h-screen pt-24 px-4 max-w-3xl mx-auto">
+        <div className="min-h-screen pt-24 px-4 max-w-3xl mx-auto relative">
+            {/* Coin Display */}
+            <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="absolute top-28 right-4 flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/20 shadow-lg z-40"
+            >
+                <Coins className="w-5 h-5 text-yellow-400" />
+                <span className="font-bold text-white tabular-nums">{coins}</span>
+            </motion.div>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -92,7 +139,7 @@ export default function TodoPage() {
                                     className={cn(
                                         "w-6 h-6 rounded-full border flex items-center justify-center transition-colors",
                                         todo.completed
-                                            ? "bg-green-500 border-green-500 text-black"
+                                            ? "bg-blue-500 border-blue-500 text-black"
                                             : "border-gray-500 hover:border-secondary"
                                     )}
                                 >
